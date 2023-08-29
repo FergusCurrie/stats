@@ -1,0 +1,169 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+n_girls <- rbinom(1, 400, 0.488)
+print(n_girls)
+```
+
+```{r}
+n_sims <- 1000
+n_girls <- rep(NA, n_sims) # reo creates vectir repeating element n times. 
+for (s in 1:n_sims){ # 1:n
+  n_girls[s] <- rbinom(1, 400, 0.488) # draw count of girls in 400
+hist(n_girls) 
+```
+
+```{r}
+n_girls <- rbinom(n_sims, 400, 0.488)
+```
+
+
+
+```{r}
+birth_type <- sample(
+  c("fraternal twin","identical twin","single birth"),
+  size=400, replace=TRUE, prob=c(1/125, 1/300, 1 - 1/125 - 1/300)
+)
+girls <- rep(NA, 400)
+for (i in 1:400){
+  if (birth_type[i]=="single birth") {
+  girls[i] <- rbinom(1, 1, 0.488) # draw boy or girl
+  } else if (birth_type[i]=="identical twin") {
+    girls[i] <- 2*rbinom(1, 1, 0.495)
+  } else if (birth_type[i]=="fraternal twin") {
+    girls[i] <- rbinom(1, 2, 0.495)
+  }
+}
+n_girls <- sum(girls)
+print(n_girls)
+```
+
+
+Alternative notation: 
+
+```{r}
+girls <- ifelse(
+  birth_type=="single birth", rbinom(400, 1, 0.488),
+  ifelse(
+    birth_type=="identical twin", 
+    2*rbinom(400, 1, 0.495),
+  rbinom(400, 2, 0.495)
+  )
+)
+print(n_girls)
+```
+
+
+Approximate distribution of number girls in 400 
+
+```{r}
+n_sims <- 1000
+n_girls <- rep(NA, n_sims)
+for (s in 1:n_sims){
+  birth_type <- sample(c("fraternal twin","identical twin","single birth"),
+  size=400, replace=TRUE, prob=c(1/125, 1/300, 1 - 1/125 - 1/300))
+  girls <- rep(NA, 400)
+  for (i in 1:400) {
+    if (birth_type[i]=="single birth") {
+      girls[i] <- rbinom(1, 1, 0.488) # draw boy or girl 
+    } else if (birth_type[i]=="identical twin") {
+      girls[i] <- 2*rbinom(1, 1, 0.495)
+    } else if (birth_type[i]=="fraternal twin") {
+      girls[i] <- rbinom(1, 2, 0.495)
+    }
+  }
+  n_girls[s] <- sum(girls)
+}
+hist(n_girls)
+```
+
+
+
+```{r}
+n_sims <- 1000
+y1 <- rnorm(n_sims, 3, 0.5)
+y2 <- exp(y1)
+y3 <- rbinom(n_sims, 20, 0.6)
+y4 <- rpois(n_sims, 5)
+par(mfrow=c(2,2)) # par plot 
+hist(y1, breaks=seq(floor(min(y1)), max(y1) + 0.2, 0.2),
+main="1000 draws from a normal dist. with mean 3, sd 0.5")
+hist(y2, breaks=seq(0, max(y2) + 5, 5),
+main="1000 draws from the corresponding lognormal dist.")
+hist(y3, breaks=seq(-0.5, 20.5, 1),
+main="1000 draws from the binomial dist. with 20 tries, probability 0.6")
+hist(y4, breaks=seq(-0.5, max(y4) + 1, 1),
+main="1000 draws from the Poisson dist. with mean 5")
+```
+
+
+```{r}
+male <- rbinom(1, 1, 0.48)
+height <- ifelse(male==1, rnorm(1, 69.1, 2.9), rnorm(1, 63.7, 2.7))
+
+N <- 10
+male <- rbinom(N, 1, 0.48)
+height <- ifelse(male==1, rnorm(N, 69.1, 2.9), rnorm(N, 63.7, 2.7))
+avg_height <- mean(height)
+print(avg_height)
+
+n_sims <- 1000
+avg_height <- rep(NA, n_sims)
+max_height <- rep(NA, n_sims)
+for (s in 1:n_sims){
+  N <- 10
+  male <- rbinom(N, 1, 0.48)
+  height <- ifelse(male==1, rnorm(N, 69.1, 2.9), rnorm(N, 63.7, 2.7))
+  avg_height[s] <- mean(height)
+  max_height[s] <- max(height)
+}
+hist(avg_height, main="Dist of avg height of 10 adults")
+hist(max_height, main="Dist of max height of 10 adults")
+```
+
+
+## Using a function for simulation step 
+
+```{r}
+height_sim <- function(N){
+  male <- rbinom(N, 1, 0.48)
+  height <- ifelse(male==1, rnorm(N, 69.1, 2.9), rnorm(N, 63.7, 2.7))
+  mean(height)
+}
+
+avg_height <- replicate(1000, height_sim(N=10))
+hist(avg_height)
+```
+
+
+
+
+
+```{r}
+z <- rnorm(1e4, 5, 2)
+cat("mean =", mean(z), ", median =", median(z), ", sd =", sd(z), ", mad sd =", mad(z))
+# mad = median of abs (z_i - median)
+```
+
+
+# Bootstrapping 
+
+
+```{r}
+earnings <- read.table("stats/ROS-Examples-master/Earnings/data/earnings.csv", header=TRUE, sep=' ')
+earnings
+```
+
+
+
+
+
+
+
+
+
+
+

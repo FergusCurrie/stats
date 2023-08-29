@@ -1,0 +1,25 @@
+
+
+
+
+```{r}
+hibbs <- read.table("ROS-Examples-master/ElectionsEconomy/data/hibbs.dat", header=TRUE)
+
+plot(hibbs$growth, hibbs$vote, xlab="Average recent growth in personal income",
+ylab="Incumbent party's vote share")
+```
+
+```{r}
+library(rstanarm)
+
+m1 <- stan_glm(vote ~ growth, data=hibbs)
+```
+
+
+```{r}
+print(m1)
+```
+
+
+
+
